@@ -1,8 +1,8 @@
 use std::fmt::{Display, Formatter};
 use std::io::{BufWriter, Write};
 use std::net::{Shutdown, TcpListener, TcpStream};
-use std::sync::{Arc, mpsc, Mutex};
-use std::sync::mpsc::{Sender, TryRecvError};
+use std::sync::mpsc;
+use std::sync::mpsc::Sender;
 use std::time::Duration;
 
 use threadpool::ThreadPool;
@@ -95,6 +95,7 @@ fn handle_connection(stream: TcpStream, channel: Sender<Response>) {
             writer.flush().unwrap();
             match response.action {
                 Terminate => { channel.send(response).expect("Error syncing response") }
+                SessionEnd => { break }
                 _ => {}
             }
 
