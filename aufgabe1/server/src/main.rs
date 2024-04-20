@@ -13,7 +13,7 @@ use crate::Action::{NoAction, SessionEnd, Terminate};
 fn main() {
     let listener = TcpListener::bind("127.0.0.1:7878").unwrap();
     listener.set_nonblocking(true).expect("Error setting nonblocking mode");
-    let pool = ThreadPool::new(2);
+    let pool = ThreadPool::new(3);
     let (tx, rx) = mpsc::channel();
     for stream in listener.incoming() {
         match stream {

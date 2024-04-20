@@ -1,35 +1,31 @@
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class Client {
 
     public static void main(String[] args) {
-        try {
-            //Establish connection
-            String address = args[0];
-            int port = Integer.parseInt(args[1]);
-            Socket socket = new Socket(address, port);
-            System.out.println("Connected!");
+        String address = args[0];
+        int port = Integer.parseInt(args[1]);
+        try (Socket clientSocket = new Socket(address, port);
+             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
+             DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
+             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8))){
 
-            //TODO: Welcome Message (User Guide)
-
-            //Input & Output (hier als String, evtl. nicht der Aufgabenstellung entsprechend, Alternative: DataInputStream?)
-            BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             String command;
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            String response;
+            String response = inFromServer.readLine();
+            if (response != null) throw new IOException("Too many clients");
 
             do {
                 command = userInput.readLine();
-                out.println(command);
-                response = in.readLine();
+                outToServer.writeBytes(command/* + '\n'*/); //alternativ: writeUTF (?)
+                response = inFromServer.readLine();
                 System.out.println(response);
             } while (!response.equals("OK BYE") && !response.equals("OK SHUTDOWN"));
 
+            //clientSocket.close();
+
         } catch (Exception e) {
-            //TODO: handle exception
-            //e.printStackTrace();
             System.out.println(e);
         }
     }
