@@ -14,6 +14,8 @@ public class Client {
             System.out.println("Connection established!");
             while (!socket.isInputShutdown() && !socket.isOutputShutdown()) {
                 if (inputStream.available() > 0) {
+                    // dangerous! we are checking whether bytes are available to read, not whether newline available
+                    // -> possible deadlock
                     final String response = br.readLine();
                     System.out.println(response);
                     if (isTerminatingCommand(response)) {
