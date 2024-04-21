@@ -58,7 +58,6 @@ fn main() {
         }
     }
     println!("Clients finished, shutdown");
-
 }
 
 fn handle_connection(stream: TcpStream, channel: Sender<Response>) {
@@ -90,6 +89,7 @@ fn handle_connection(stream: TcpStream, channel: Sender<Response>) {
             }
         }
         if (message.len() != 0) {
+            println!("New Command: {}", message);
             let response = process_message(message);
             writer.write(response.to_string().as_bytes()).unwrap();
             writer.flush().unwrap();
