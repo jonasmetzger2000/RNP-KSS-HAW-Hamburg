@@ -1,5 +1,5 @@
 use std::fmt::{Display, Formatter};
-use std::io::{BufWriter, Write};
+use std::io::{BufWriter, Empty, Write};
 use std::net::{Shutdown, TcpListener, TcpStream};
 use std::sync::mpsc;
 use std::sync::mpsc::Sender;
@@ -61,6 +61,7 @@ fn main() {
 }
 
 fn handle_connection(stream: TcpStream, channel: Sender<Response>) {
+    println!("Opened a Connection");
     stream.set_nonblocking(false).expect("Error setting nonblock");
     let mut reader = Reader::new(&stream);
     let mut writer = BufWriter::new(&stream);
@@ -98,29 +99,48 @@ fn handle_connection(stream: TcpStream, channel: Sender<Response>) {
                 SessionEnd => { break }
                 _ => {}
             }
-
         }
     }
+    println!("Closed a Connection");
 }
 
 fn process_message(message: String) -> Response {
     return if message.starts_with("LOWERCASE") {
-        Response {
-            action: NoAction,
-            error: false,
-            message: lowercase(message.strip_prefix("LOWERCASE").unwrap().to_string())
+        let string = message.strip_prefix("LOWERCASE").unwrap().to_string();
+        match check_empty_body(string.clone()) {
+            None => {
+                Response {
+                    action: NoAction,
+                    error: false,
+                    message: lowercase(string)
+                }
+            }
+            Some(err) => { err }
         }
+
     } else if message.starts_with("UPPERCASE") {
-        Response {
-            action: NoAction,
-            error: false,
-            message: uppercase(message.strip_prefix("UPPERCASE").unwrap().to_string())
+        let string = uppercase(message.strip_prefix("UPPERCASE").unwrap().to_string());
+        match check_empty_body(string.clone()) {
+            None => {
+                Response {
+                    action: NoAction,
+                    error: false,
+                    message: string
+                }
+            }
+            Some(err) => { err }
         }
     } else if message.starts_with("REVERSE") {
-        Response {
-            action: NoAction,
-            error: false,
-            message: reverse(message.strip_prefix("REVERSE").unwrap().to_string())
+        let string = reverse(message.strip_prefix("REVERSE").unwrap().to_string());
+        match check_empty_body(string.clone()) {
+            None => {
+                Response {
+                    action: NoAction,
+                    error: false,
+                    message: string
+                }
+            }
+            Some(err) => { err }
         }
     } else if message.starts_with("BYE") {
         Response {
@@ -149,6 +169,16 @@ fn process_message(message: String) -> Response {
             message: "UNKNOWN_CMD".to_string()
         }
     }
+}
+
+fn check_empty_body(body: String) -> Option<Response> {
+    if body.trim().is_empty() {
+        return Some(Response {
+            action: NoAction,
+            error: true,
+            message: "EMPTY_BODY".to_string()
+        })
+    } return None;
 }
 
 struct Response {
