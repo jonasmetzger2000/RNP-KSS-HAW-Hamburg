@@ -5,8 +5,8 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
 
-public class TestHandler extends IdleStateHandler {
-    public TestHandler(int allIdleTimeSeconds) {
+public class IdleConnectionCloseHandler extends IdleStateHandler {
+    public IdleConnectionCloseHandler(int allIdleTimeSeconds) {
         super(0, 0, allIdleTimeSeconds);
     }
 
