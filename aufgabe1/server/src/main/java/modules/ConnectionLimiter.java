@@ -23,11 +23,8 @@ public class ConnectionLimiter extends ChannelInboundHandlerAdapter {
         }
     }
 
-
-
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
+    public void channelUnregistered(ChannelHandlerContext ctx) {
         connections.decrementAndGet();
     }
 }

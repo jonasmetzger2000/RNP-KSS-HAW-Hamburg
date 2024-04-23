@@ -11,7 +11,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @RequiredArgsConstructor
 public class MessageHandler extends ChannelInboundHandlerAdapter {
 
-    private final AtomicBoolean terminate;
     private final MessageParser parser = new MessageParser();
 
     @Override
@@ -22,7 +21,7 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
             else ctx.write("OK ");
             ctx.write(response.getMsg());
             ctx.write("\n");
-            if (response.isTermination()) terminate.set(true);
+            if (response.isTermination()) ctx.fireExceptionCaught(new ServerTerminationException());
             if (response.isSessionEnd()) ctx.close();
         }
     }
@@ -31,4 +30,6 @@ public class MessageHandler extends ChannelInboundHandlerAdapter {
     public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
     }
+
+    static class ServerTerminationException extends Throwable {}
 }

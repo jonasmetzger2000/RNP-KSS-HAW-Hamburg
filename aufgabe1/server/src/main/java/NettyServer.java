@@ -6,10 +6,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LineBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import modules.ConnectionLimiter;
-import modules.MessageHandler;
-import modules.SkipLongBytes;
-import modules.TerminatingHandler;
+import io.netty.handler.timeout.IdleStateHandler;
+import modules.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,13 +28,13 @@ public class NettyServer {
                         @Override
                         protected void initChannel(Channel channel) {
                             final ChannelPipeline pipeline = channel.pipeline();
-                            pipeline.addLast(new TerminatingHandler(terminating));
                             pipeline.addLast(new LineBasedFrameDecoder(Integer.parseInt(env.get("PROT_MAX_BYTE_SIZE"))));
                             pipeline.addLast(new StringDecoder(StandardCharsets.UTF_8));
                             pipeline.addLast(new StringEncoder(StandardCharsets.UTF_8));
                             pipeline.addLast(new SkipLongBytes());
                             pipeline.addLast(new ConnectionLimiter());
-                            pipeline.addLast(new MessageHandler(terminating));
+                            pipeline.addLast(new MessageHandler());
+                            pipeline.addLast(new TerminatingHandler());
                         }
                     })
                     .option(ChannelOption.SO_BACKLOG, 128)
