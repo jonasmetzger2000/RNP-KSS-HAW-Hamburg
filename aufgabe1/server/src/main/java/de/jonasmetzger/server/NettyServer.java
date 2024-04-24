@@ -27,7 +27,7 @@ public class NettyServer {
         final EventLoopGroup bossGroup = new NioEventLoopGroup();
         final EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-            logger.info("Bootstrapping TCP Server on");
+            logger.info("Bootstrapping TCP Server on {}:{}", Configuration.TCP_HOST, Configuration.TCP_PORT);
             final ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
