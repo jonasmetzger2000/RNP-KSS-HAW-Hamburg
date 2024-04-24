@@ -1,4 +1,4 @@
-package msg;
+package de.jonasmetzger.server.msg;
 
 import lombok.Getter;
 
@@ -26,10 +26,22 @@ public class Response {
     }
 
     public static Response sessionEnd() {
-        return new Response(false, true, false, "OK BYE");
+        return new Response(false, true, false, "BYE");
     }
 
     public static Response terminate() {
-        return new Response(true, true, false, "OK BYE");
+        return new Response(true, true, false, "BYE");
+    }
+    public static Response terminated() { return new Response(true, true, true, "SERVER_CLOSING"); }
+    public static Response noConnectionsAvailable() { return new Response(false, true, true, "NO_CONN_AVAIL"); }
+
+    @Override
+    public String toString() {
+        final StringBuilder stringBuilder = new StringBuilder();
+        if (error) stringBuilder.append("ERROR ");
+        else stringBuilder.append("OK ");
+        stringBuilder.append(msg);
+        stringBuilder.append("\n");
+        return stringBuilder.toString();
     }
 }

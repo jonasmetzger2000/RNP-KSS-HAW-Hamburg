@@ -1,7 +1,10 @@
-package modules;
+package de.jonasmetzger.server.modules;
 
+import de.jonasmetzger.server.msg.Response;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -9,6 +12,8 @@ import static io.netty.channel.ChannelHandler.*;
 
 @Sharable
 public class ConnectionLimiter extends ChannelInboundHandlerAdapter {
+
+    final static Logger logger = LogManager.getLogger(ConnectionLimiter.class);
 
     private static final AtomicInteger connections = new AtomicInteger();
 
@@ -18,7 +23,8 @@ public class ConnectionLimiter extends ChannelInboundHandlerAdapter {
         if (val <= 2) {
             super.channelActive(ctx);
         } else {
-            ctx.writeAndFlush("ERROR NO_CONNECTIONS_AVAILABLE\n");
+            logger.warn("Connections Threshold reached, terminating new Client {}", ctx.channel().id().asShortText());
+            ctx.writeAndFlush(Response.noConnectionsAvailable());
             ctx.close();
         }
     }
