@@ -1,3 +1,5 @@
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -6,16 +8,17 @@ import java.nio.charset.StandardCharsets;
 public class Client {
 
     public static void main(String[] args) {
+        final Dotenv dotenv = Dotenv.load();
+        final int bytePerPacket = Integer.parseInt(dotenv.get("BYTE_PER_PAKET"));
         try (final Socket socket = new Socket("localhost", 7878)) {
+            socket.setSendBufferSize(bytePerPacket);
             final BufferedReader stdInReader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             final InputStream inputStream = socket.getInputStream();
             final BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            final DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+            final OutputStream outputStream = socket.getOutputStream();
             System.out.println("Connection established!");
             while (!socket.isInputShutdown() && !socket.isOutputShutdown()) {
                 if (inputStream.available() > 0) {
-                    // dangerous! we are checking whether bytes are available to read, not whether newline available
-                    // -> possible deadlock
                     final String response = br.readLine();
                     System.out.println(response);
                     if (isTerminatingCommand(response)) {
@@ -24,7 +27,7 @@ public class Client {
                 }
                 if (stdInReader.ready()) {
                     final String cmd = stdInReader.readLine();
-                    dataOutputStream.write(cmd.concat("\n").getBytes(StandardCharsets.UTF_8));
+                    outputStream.write(cmd.concat("\n").getBytes(StandardCharsets.UTF_8));
                 }
             }
             System.out.println("Connection closed.");
@@ -36,6 +39,6 @@ public class Client {
     }
 
     private static boolean isTerminatingCommand(String response) {
-        return response.equals("OK BYE") || response.equals("OK SHUTDOWN") || response.equals("ERROR OUT_OF_RESS") || response.equals("ERROR TERMINATING");
+        return response.equals("OK BYE") || response.equals("OK SHUTDOWN") || response.equals("ERROR SERVER_CLOSING") || response.equals("ERROR NO_CONN_AVAIL");
     }
 }

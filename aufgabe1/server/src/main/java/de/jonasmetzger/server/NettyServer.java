@@ -35,6 +35,7 @@ public class NettyServer {
                         @Override
                         protected void initChannel(Channel channel) {
                             final ChannelPipeline pipeline = channel.pipeline();
+
                             pipeline.addLast(new LineBasedFrameDecoder(Configuration.PROT_MAX_BYTE_SIZE));
                             pipeline.addLast(new StringDecoder(StandardCharsets.UTF_8));
                             pipeline.addLast(new StringEncoder(StandardCharsets.UTF_8));
