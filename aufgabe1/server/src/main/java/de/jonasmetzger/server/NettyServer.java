@@ -1,21 +1,22 @@
 package de.jonasmetzger.server;
 
-import de.jonasmetzger.server.modules.ConnectionLimiter;
-import de.jonasmetzger.server.modules.ResponseEncoder;
-import de.jonasmetzger.server.modules.SkipLongBytes;
-import de.jonasmetzger.server.modules.TerminatingHandler;
+import de.jonasmetzger.server.modules.*;
 import de.jonasmetzger.server.msg.MessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.*;
+import io.netty.handler.codec.bytes.ByteArrayDecoder;
+import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class NettyServer {
 
@@ -35,7 +36,6 @@ public class NettyServer {
                         @Override
                         protected void initChannel(Channel channel) {
                             final ChannelPipeline pipeline = channel.pipeline();
-
                             pipeline.addLast(new LineBasedFrameDecoder(Configuration.PROT_MAX_BYTE_SIZE));
                             pipeline.addLast(new StringDecoder(StandardCharsets.UTF_8));
                             pipeline.addLast(new StringEncoder(StandardCharsets.UTF_8));

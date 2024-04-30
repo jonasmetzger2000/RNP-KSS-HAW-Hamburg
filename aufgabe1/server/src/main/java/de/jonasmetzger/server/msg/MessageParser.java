@@ -8,6 +8,7 @@ public class MessageParser {
     final static Logger logger = LogManager.getLogger(MessageParser.class);
 
     public Response parse(String msg, String client) {
+        if (msg.contains("\r")) return Response.err("\\r_NOT_ALLOWED");
         if (msg.startsWith("LOWERCASE")) {
             final String params = msg.substring(9).strip();
             if (params.isEmpty()) {

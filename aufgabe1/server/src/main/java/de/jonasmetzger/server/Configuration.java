@@ -8,6 +8,7 @@ public class Configuration {
     public static int MAX_CLIENTS;
     public static int PROT_MAX_BYTE_SIZE;
     public static int TERMINATION_SOCKET_TIMEOUT;
+    public static String SHUTDOWN_PASSWORD;
 
     private static Dotenv dotenv;
 
@@ -18,6 +19,7 @@ public class Configuration {
         MAX_CLIENTS = loadInt("MAX_CLIENTS", 3);
         PROT_MAX_BYTE_SIZE = loadInt("PROT_MAX_BYTE_SIZE", 255);
         TERMINATION_SOCKET_TIMEOUT = loadInt("TERMINATION_SOCKET_TIMEOUT", 30);
+        SHUTDOWN_PASSWORD = dotenv.get("SHUTDOWN_PASSWORD", "HAW");
     }
 
     private static int loadInt(String key, int defaultValue) {
