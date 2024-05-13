@@ -9,7 +9,7 @@ public class MessageParser {
 
     public Response parse(String msg, String client) {
         Response response;
-        logger.info("Incoming message from client {} with request {}", client, msg);
+        logger.info("Incoming message from client {} with request '{}'", client, msg);
         if (msg.contains("\r")) return Response.err("\\r_NOT_ALLOWED");
         if (msg.startsWith("LOWERCASE")) {
             final String params = msg.substring(9).strip();
