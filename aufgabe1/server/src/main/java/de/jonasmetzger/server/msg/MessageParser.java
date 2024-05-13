@@ -3,6 +3,8 @@ package de.jonasmetzger.server.msg;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Pattern;
 
 public class MessageParser {
@@ -11,7 +13,7 @@ public class MessageParser {
 
     public Response parse(String msg, String client) {
         Response response;
-        logger.info("Incoming message from client {} with request '{}'", client, Pattern.quote(msg));
+        logger.info("Incoming message from client {} with request '{}'", client, URLEncoder.encode(msg, StandardCharsets.UTF_8));
         if (msg.contains("\r")) return Response.err("\\r_NOT_ALLOWED");
         if (msg.startsWith("LOWERCASE")) {
             final String params = msg.substring(9).strip();
@@ -56,7 +58,7 @@ public class MessageParser {
             logger.info("Invalid Command Received from client {}", client);
             response = Response.err("INVALID_CMD");
         }
-        logger.info("Response for client {} with response '{}'", client, Pattern.quote(response.toString()));
+        logger.info("Response for client {} with response '{}'", client, URLEncoder.encode(response.toString(), StandardCharsets.UTF_8));
         return response;
     }
 }
